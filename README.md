@@ -36,7 +36,7 @@ cd external-data-provider
 # if you are not planning to establish mTLS between the provider and Gatekeeper,
 # deploy the provider to a separate namespace. Otherwise, do not run the following command
 # and deploy the provider to the same namespace as Gatekeeper.
-export NAMESPACE=provider-system
+export NAMESPACE=security
 
 # generate a self-signed certificate for the external data provider
 ./scripts/generate-tls-cert.sh

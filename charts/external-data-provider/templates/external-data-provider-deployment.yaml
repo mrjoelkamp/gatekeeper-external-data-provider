@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: external-data-provider
+  name: attest-provider
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: external-data-provider
+      run: attest-provider
   template:
     metadata:
       labels:
-        run: external-data-provider
+        run: attest-provider
     spec:
       containers:
-      - image: openpolicyagent/gatekeeper-external-data-provider:dev
+      - image: docker/attest-provider:dev
         imagePullPolicy: IfNotPresent
-        name: external-data-provider
+        name: attest-provider
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
         args:
@@ -28,8 +28,10 @@ spec:
         ports:
         - containerPort: {{ .Values.port }}
           protocol: TCP
-        {{- if .Values.clientCAFile }}
         volumeMounts:
+        - name: tuf-temp
+          mountPath: /tuf_temp
+        {{- if .Values.clientCAFile }}
         - name: gatekeeper-ca-cert
           mountPath: /tmp/gatekeeper
           readOnly: true
@@ -37,8 +39,10 @@ spec:
       restartPolicy: Always
       nodeSelector:
         kubernetes.io/os: linux
-      {{- if .Values.clientCAFile }}
       volumes:
+      - name: tuf-temp
+        emptyDir: {}
+      {{- if .Values.clientCAFile }}
       - name: gatekeeper-ca-cert
         secret:
           secretName: gatekeeper-webhook-server-cert

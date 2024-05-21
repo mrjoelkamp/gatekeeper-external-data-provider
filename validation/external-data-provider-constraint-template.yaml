@@ -1,12 +1,12 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
-  name: k8sexternaldatavalidation
+  name: k8sattestexternaldata
 spec:
   crd:
     spec:
       names:
-        kind: K8sExternalDataValidation
+        kind: K8sAttestExternalData
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
@@ -17,7 +17,7 @@ spec:
           images := [img | img = input.review.object.spec.containers[_].image]
 
           # send external data request
-          response := external_data({"provider": "external-data-provider", "keys": images})
+          response := external_data({"provider": "attest-provider", "keys": images})
 
           response_with_error(response)
 
@@ -27,7 +27,7 @@ spec:
         response_with_error(response) {
           count(response.errors) > 0
           errs := response.errors[_]
-          contains(errs[1], "_invalid")
+          contains(errs[i], "admit: false")
         }
 
         response_with_error(response) {

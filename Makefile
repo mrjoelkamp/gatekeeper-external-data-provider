@@ -1,4 +1,4 @@
-REPOSITORY ?= openpolicyagent/gatekeeper-external-data-provider
+REPOSITORY ?= docker/attest-provider
 IMG := $(REPOSITORY):dev
 
 # When updating this, make sure to update the corresponding action in
@@ -10,7 +10,7 @@ GOLANGCI_LINT_CACHE := $(shell pwd)/.tmp/golangci-lint
 
 .PHONY: build
 build:
-	go build -o bin/provider main.go
+	go build -o bin/attest main.go
 
 # lint runs a dockerized golangci-lint, and should give consistent results
 # across systems.
@@ -30,7 +30,7 @@ docker-buildx-builder:
 
 .PHONY: docker-buildx
 docker-buildx: docker-buildx-builder
-	docker buildx build --load -t ${IMG} .
+	docker buildx build --load -t ${IMG} . --secret=id=GITHUB_TOKEN
 
 .PHONY: kind-load-image
 kind-load-image:

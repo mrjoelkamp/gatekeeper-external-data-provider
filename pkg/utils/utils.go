@@ -32,9 +32,16 @@ func SendResponse(results *[]externaldata.Item, systemErr string, w http.Respons
 
 	klog.InfoS("sending response", "response", response)
 
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		klog.ErrorS(err, "unable to encode response")
+	body, err := json.Marshal(response)
+	if err != nil {
+		klog.ErrorS(err, "unable to marshal response")
+		os.Exit(1)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(body)
+	if err != nil {
+		klog.ErrorS(err, "unable to write response")
 		os.Exit(1)
 	}
 }
