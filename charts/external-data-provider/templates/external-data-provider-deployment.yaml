@@ -18,16 +18,7 @@ spec:
         imagePullPolicy: IfNotPresent
         name: external-data-provider
         securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsGroup: 65532
-          runAsNonRoot: true
-          runAsUser: 65532
-          seccompProfile:
-            type: RuntimeDefault
+          {{- toYaml .Values.securityContext | nindent 12 }}
         args:
         - --cert-dir={{ .Values.certDir }}
         {{- if .Values.clientCAFile }}
